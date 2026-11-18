@@ -37,20 +37,13 @@ class AuthController extends Controller
             'password.required' => 'Password wajib diisi.',
         ]);
 
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
-
-            $user = Auth::user();
-
-            // Redirect sesuai role pengguna
-            if ($user->role === 'admin') {
-                return redirect()->route('dashboard')
-                    ->with('success', 'Selamat datang, ' . $user->name . ' (Admin)!');
-            }
-
-            return redirect()->route('home')
-                ->with('success', 'Selamat datang, ' . $user->name . '!');
-        }
+if (Auth::attempt($credentials)) {
+    $request->session()->regenerate();
+    if (Auth::user()->role === 'admin') {
+        return redirect()->intended(route('dashboard'));
+    }
+    return redirect()->route('home');
+}
 
         return back()->withErrors([
             'email' => 'Email atau password yang Anda masukkan salah.',

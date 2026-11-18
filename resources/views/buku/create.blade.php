@@ -1,3 +1,4 @@
+
 @extends('layouts.app')
 
 @section('content')
@@ -15,8 +16,8 @@
 
         <div class="card shadow-sm">
             <div class="card-body p-4">
-                {{-- TODO 7: Tambahkan atribut enctype="multipart/form-data" pada form di bawah ini --}}
-                <form action="{{ route('buku.store') }}" method="POST">
+
+                <form action="{{ route('buku.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
 
                     <div class="mb-3">
@@ -33,7 +34,8 @@
                             <input type="text" class="form-control @error('penulis') is-invalid @enderror" id="penulis" name="penulis" value="{{ old('penulis') }}" placeholder="Contoh: John Doe" required maxlength="100">
                             @error('penulis')
                                 <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                            </div>
+                        @enderror
                         </div>
 
                         <div class="col-md-6 mb-3">
@@ -63,10 +65,45 @@
                         </div>
                     </div>
 
-                    {{-- TODO 7: Tambahkan field input file untuk upload sampul buku dan wadah pratinjau (preview) gambar --}}
+                    {{-- Upload Sampul Buku --}}
+                    <div class="mb-4">
+                        <label for="cover" class="form-label fw-semibold">
+                            Sampul Buku
+                        </label>
+
+                        <input
+                            type="file"
+                            class="form-control @error('cover') is-invalid @enderror"
+                            id="cover"
+                            name="cover"
+                            accept=".jpg,.jpeg,.png"
+                            onchange="previewImage(event)"
+                        >
+
+                        <small class="text-muted">
+                            Format JPG, JPEG, atau PNG. Maksimal 2 MB.
+                        </small>
+
+                        @error('cover')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+
+                        <div class="mt-3">
+                            <img
+                                id="imagePreview"
+                                src="#"
+                                alt="Preview Sampul Buku"
+                                class="img-thumbnail d-none"
+                                style="max-width: 200px; max-height: 250px; object-fit: contain;"
+                            >
+                        </div>
+                    </div>
 
                     <div class="d-flex justify-content-end gap-2">
-                        <a href="{{ route('buku.index') }}" class="btn btn-light border px-4">Batal</a>
+                        <a href="{{ route('buku.index') }}" class="btn btn-light border px-4">
+                            Batal
+                        </a>
+
                         <button type="submit" class="btn btn-primary px-4">
                             <i class="bi bi-save me-1"></i> Simpan Buku
                         </button>
@@ -79,15 +116,21 @@
 
 <script>
     function previewImage(event) {
-        var input = event.target;
+        const input = event.target;
+        const preview = document.getElementById('imagePreview');
+
         if (input.files && input.files[0]) {
-            var reader = new FileReader();
+            const reader = new FileReader();
+
             reader.onload = function(e) {
-                var preview = document.getElementById('imagePreview');
                 preview.src = e.target.result;
                 preview.classList.remove('d-none');
             };
+
             reader.readAsDataURL(input.files[0]);
+        } else {
+            preview.src = '#';
+            preview.classList.add('d-none');
         }
     }
 </script>
